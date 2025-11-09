@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>密码锁测试</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial;
+            background: #f0f0f0;
+            padding: 50px;
+        }
+        .digit {
+            display: inline-block;
+            width: 60px;
+            height: 80px;
+            background: white;
+            border: 2px solid #333;
+            margin: 10px;
+            font-size: 36px;
+            line-height: 80px;
+            border-radius: 5px;
+        }
+        button {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            font-size: 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .keypad {
+            margin: 20px auto;
+            width: 240px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 数字密码锁</h1>
+    <p>点击数字按钮输入密码</p>
+    
+    <!-- 数字显示区域 -->
+    <div class="code-display">
+        <div class="digit" id="digit1">-</div>
+        <div class="digit" id="digit2">-</div>
+        <div class="digit" id="digit3">-</div>
+        <div class="digit" id="digit4">-</div>
+    </div>
+    
+    <!-- 数字键盘 -->
+    <div class="keypad">
+        <button onclick="addNumber(1)">1</button>
+        <button onclick="addNumber(2)">2</button>
+        <button onclick="addNumber(3)">3</button><br>
+        <button onclick="addNumber(4)">4</button>
+        <button onclick="addNumber(5)">5</button>
+        <button onclick="addNumber(6)">6</button><br>
+        <button onclick="addNumber(7)">7</button>
+        <button onclick="addNumber(8)">8</button>
+        <button onclick="addNumber(9)">9</button><br>
+        <button onclick="addNumber(0)">0</button>
+        <button onclick="resetNumbers()" style="background: #f44336;">重置</button>
+        <button onclick="checkCode()" style="background: #2196F3; width: 130px;">提交</button>
+    </div>
+    
+    <div id="message" style="margin: 20px; font-weight: bold;"></div>
+
+    <script>
+        let code = [];
+        const correctCode = [1,2,3,4]; // 简单密码，方便测试
+        
+        function addNumber(num) {
+            if (code.length < 4) {
+                code.push(num);
+                updateDisplay();
+            }
+        }
+        
+        function resetNumbers() {
+            code = [];
+            updateDisplay();
+            document.getElementById('message').textContent = '';
+        }
+        
+        function updateDisplay() {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('digit' + (i+1)).textContent = code[i] !== undefined ? code[i] : '-';
+            }
+        }
+        
+        function checkCode() {
+            if (code.length !== 4) {
+                document.getElementById('message').textContent = '请输入4位数字！';
+                document.getElementById('message').style.color = 'red';
+                return;
+            }
+            
+            if (JSON.stringify(code) === JSON.stringify(correctCode)) {
+                document.getElementById('message').textContent = '🎉 恭喜！密码正确！';
+                document.getElementById('message').style.color = 'green';
+            } else {
+                document.getElementById('message').textContent = '❌ 密码错误，试试 1234';
+                document.getElementById('message').style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
