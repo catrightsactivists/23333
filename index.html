@@ -1,233 +1,296 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <title>探险解谜游戏</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑水庄园 - 六边形书房</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background: #2c3e50;
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a1a;
+            color: #e0d0b0;
+            font-family: 'Times New Roman', serif;
             overflow: hidden;
-        }
-        
-        /* 游戏主地图 */
-        #game-map {
-            width: 800px;
-            height: 450px;
-            background: linear-gradient(45deg, #8e44ad, #3498db);
-            margin: 20px auto;
-            position: relative;
-            border: 3px solid #ecf0f1;
-            border-radius: 10px;
-        }
-        
-        /* 玩家角色 */
-        #player {
-            width: 30px;
-            height: 30px;
-            background: #e74c3c;
-            border-radius: 50%;
-            position: absolute;
-            left: 400px;
-            top: 225px;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
-            transition: all 0.1s ease;
-        }
-        
-        /* 控制按钮区域 - 左下角 */
-        #controls {
-            position: fixed;
-            left: 50px;
-            bottom: 50px;
-        }
-        
-        .control-row {
+            height: 100vh;
             display: flex;
             justify-content: center;
-            margin: 5px 0;
+            align-items: center;
         }
-        
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            background: rgba(52, 152, 219, 0.8);
-            border: none;
-            border-radius: 50%;
-            margin: 0 10px;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.9);
-            background: #2980b9;
-        }
-        
-        /* 背包按钮 - 右下角 */
-        #inventory-btn {
+
+        /* 开场动画 */
+        #opening {
             position: fixed;
-            right: 50px;
-            bottom: 50px;
-            width: 80px;
-            height: 80px;
-            background: rgba(241, 196, 15, 0.9);
-            border: none;
-            border-radius: 50%;
-            font-size: 40px;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: all 0.3s;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
-        
-        #inventory-btn:hover {
-            transform: scale(1.1);
-            background: #f39c12;
-        }
-        
-        /* 谜题触发区域 */
-        .puzzle-area {
+
+        .eyelid {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(46, 204, 113, 0.3);
-            border: 2px dashed #2ecc71;
-            border-radius: 10px;
-            cursor: pointer;
+            width: 100%;
+            height: 50%;
+            background: #000;
+            left: 0;
+            z-index: 2;
         }
-        
-        /* 背包界面 */
-        #inventory {
-            position: fixed;
-            right: -300px;
+
+        .top-lid {
+            top: -50%;
+            animation: blinkDown 3s ease-in-out forwards;
+        }
+
+        .bottom-lid {
+            bottom: -50%;
+            animation: blinkUp 3s ease-in-out forwards;
+        }
+
+        @keyframes blinkDown {
+            0% { top: -50%; }
+            30% { top: 0; }
+            70% { top: 0; }
+            100% { top: -50%; }
+        }
+
+        @keyframes blinkUp {
+            0% { bottom: -50%; }
+            30% { bottom: 0; }
+            70% { bottom: 0; }
+            100% { bottom: -50%; }
+        }
+
+        .opening-text {
+            color: #c0a878;
+            font-size: 24px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInText 3s ease-in-out 1.5s forwards;
+            z-index: 3;
+            position: relative;
+            text-shadow: 0 0 10px rgba(192, 168, 120, 0.5);
+        }
+
+        @keyframes fadeInText {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* 主大厅 */
+        #main-hall {
+            opacity: 0;
+            animation: fadeInHall 2s ease-in-out 4.5s forwards;
+            position: relative;
+            width: 600px;
+            height: 600px;
+        }
+
+        @keyframes fadeInHall {
+            to { opacity: 1; }
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #2a2419;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            border: 2px solid #c0a878;
+        }
+
+        .center-rug {
+            position: absolute;
             top: 50%;
-            transform: translateY(-50%);
-            width: 250px;
-            height: 400px;
-            background: rgba(52, 73, 94, 0.95);
-            border-radius: 15px 0 0 15px;
-            padding: 20px;
-            color: white;
-            transition: right 0.5s ease;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: #8b4513;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            opacity: 0.6;
         }
-        
-        #inventory.show {
-            right: 0;
-        }
-        
-        .item-slot {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid #7f8c8d;
-            border-radius: 8px;
-            margin: 5px;
-            display: inline-flex;
+
+        /* 六面墙的样式 */
+        .wall {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            background: #3a3325;
+            border: 1px solid #5a4c3a;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 20px;
+            text-align: center;
         }
+
+        .wall:hover {
+            background: #4a3f2f;
+            border-color: #c0a878;
+            transform: scale(1.05);
+        }
+
+        .wall-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .wall-title {
+            font-size: 16px;
+            color: #c0a878;
+            margin-bottom: 8px;
+        }
+
+        .wall-desc {
+            font-size: 12px;
+            color: #a09070;
+            opacity: 0.8;
+        }
+
+        /* 六面墙的具体位置 */
+        .wall-1 { /* 祭坛之门 */
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+        }
+
+        .wall-2 { /* 家族树 */
+            top: 75px;
+            right: 50px;
+            transform: rotate(60deg);
+        }
+
+        .wall-3 { /* 炼金台 */
+            bottom: 75px;
+            right: 50px;
+            transform: rotate(120deg);
+        }
+
+        .wall-4 { /* 世界地图 */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+        .wall-5 { /* 家主书桌 */
+            bottom: 75px;
+            left: 50px;
+            transform: rotate(240deg);
+        }
+
+        .wall-6 { /* 古典油画 */
+            top: 75px;
+            left: 50px;
+            transform: rotate(300deg);
+        }
+
+        /* 墙内内容样式（保持正向） */
+        .wall-content {
+            transform: rotate(-0deg);
+        }
+
+        .wall-2 .wall-content { transform: rotate(-60deg); }
+        .wall-3 .wall-content { transform: rotate(-120deg); }
+        .wall-4 .wall-content { transform: rotate(-180deg); }
+        .wall-5 .wall-content { transform: rotate(-240deg); }
+        .wall-6 .wall-content { transform: rotate(-300deg); }
     </style>
 </head>
 <body>
-    <!-- 游戏主地图 -->
-    <div id="game-map">
-        <div id="player"></div>
+    <!-- 开场动画 -->
+    <div id="opening">
+        <div class="eyelid top-lid"></div>
+        <div class="opening-text">
+            你在一个陌生的书房中醒来<br>
+            请尝试探索整个房间，找回丢失的记忆
+        </div>
+        <div class="eyelid bottom-lid"></div>
+    </div>
+
+    <!-- 主大厅 -->
+    <div id="main-hall">
+        <div class="hexagon"></div>
+        <div class="center-rug"></div>
         
-        <!-- 谜题区域 -->
-        <div class="puzzle-area" style="left: 100px; top: 100px;" onclick="triggerPuzzle(1)">🔒</div>
-        <div class="puzzle-area" style="left: 600px; top: 300px;" onclick="triggerPuzzle(2)">📖</div>
-        <div class="puzzle-area" style="left: 300px; top: 350px;" onclick="triggerPuzzle(3)">🎁</div>
-    </div>
-    
-    <!-- 左下角：移动控制按钮 -->
-    <div id="controls">
-        <div class="control-row">
-            <button class="control-btn" onclick="movePlayer('up')">↑</button>
+        <!-- 祭坛之门 -->
+        <div class="wall wall-1" onclick="exploreWall('祭坛之门')">
+            <div class="wall-content">
+                <div class="wall-icon">🚪</div>
+                <div class="wall-title">祭坛之门</div>
+                <div class="wall-desc">沉重的黄铜门，上有七个奇异的锁孔</div>
+            </div>
         </div>
-        <div class="control-row">
-            <button class="control-btn" onclick="movePlayer('left')">←</button>
-            <button class="control-btn" onclick="movePlayer('down')">↓</button>
-            <button class="control-btn" onclick="movePlayer('right')">→</button>
+        
+        <!-- 家族树 -->
+        <div class="wall wall-2" onclick="exploreWall('家族树')">
+            <div class="wall-content">
+                <div class="wall-icon">🌳</div>
+                <div class="wall-title">家族树</div>
+                <div class="wall-desc">被血色污迹覆盖的家族谱系</div>
+            </div>
         </div>
-    </div>
-    
-    <!-- 右下角：背包按钮 -->
-    <button id="inventory-btn" onclick="toggleInventory()">🎒</button>
-    
-    <!-- 背包界面 -->
-    <div id="inventory">
-        <h3>📦 背包</h3>
-        <div id="item-grid">
-            <div class="item-slot">🗝️</div>
-            <div class="item-slot">🔑</div>
-            <div class="item-slot"></div>
-            <div class="item-slot"></div>
-            <div class="item-slot"></div>
-            <div class="item-slot"></div>
+        
+        <!-- 炼金台 -->
+        <div class="wall wall-3" onclick="exploreWall('炼金台')">
+            <div class="wall-content">
+                <div class="wall-icon">⚗️</div>
+                <div class="wall-title">炼金实验室</div>
+                <div class="wall-desc">散发着幽绿光芒的药剂与手稿</div>
+            </div>
         </div>
-        <p>收集的物品会出现在这里</p >
+        
+        <!-- 世界地图 -->
+        <div class="wall wall-4" onclick="exploreWall('世界地图')">
+            <div class="wall-content">
+                <div class="wall-icon">🗺️</div>
+                <div class="wall-title">世界地图</div>
+                <div class="wall-desc">以庄园为中心的傲慢版图</div>
+            </div>
+        </div>
+        
+        <!-- 家主书桌 -->
+        <div class="wall wall-5" onclick="exploreWall('家主书桌')">
+            <div class="wall-content">
+                <div class="wall-icon">💼</div>
+                <div class="wall-title">家主书桌</div>
+                <div class="wall-desc">藏有家族秘密的录音与日记</div>
+            </div>
+        </div>
+        
+        <!-- 古典油画 -->
+        <div class="wall wall-6" onclick="exploreWall('古典油画')">
+            <div class="wall-content">
+                <div class="wall-icon">🖼️</div>
+                <div class="wall-title">神秘油画</div>
+                <div class="wall-desc">描绘圣水传说的古典画作</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        let playerPosition = { x: 400, y: 225 };
-        let inventoryItems = ['🗝️', '🔑'];
-        
-        // 移动玩家
-        function movePlayer(direction) {
-            const player = document.getElementById('player');
-            const step = 20;
-            
-            switch(direction) {
-                case 'up': playerPosition.y -= step; break;
-                case 'down': playerPosition.y += step; break;
-                case 'left': playerPosition.x -= step; break;
-                case 'right': playerPosition.x += step; break;
-            }
-            
-            // 边界检查
-            playerPosition.x = Math.max(15, Math.min(785, playerPosition.x));
-            playerPosition.y = Math.max(15, Math.min(435, playerPosition.y));
-            
-            player.style.left = playerPosition.x + 'px';
-            player.style.top = playerPosition.y + 'px';
-            
-            checkPuzzleCollision();
+        // 探索墙面的函数
+        function exploreWall(wallName) {
+            alert(`开始探索: ${wallName}\n\n（在实际游戏中，这里将跳转到对应的子页面进行详细解谜）`);
         }
-        
-        // 切换背包显示
-        function toggleInventory() {
-            const inventory = document.getElementById('inventory');
-            inventory.classList.toggle('show');
-        }
-        
-        // 检查是否碰到谜题区域
-        function checkPuzzleCollision() {
-            // 这里可以添加自动触发逻辑
-        }
-        
-        // 触发谜题
-        function triggerPuzzle(puzzleId) {
-            alert(`触发谜题 ${puzzleId}！`);
-            // 这里可以跳转到其他页面或显示谜题窗口
-            // window.location.href = `puzzle${puzzleId}.html`;
-        }
-        
-        // 键盘控制（可选）
-        document.addEventListener('keydown', function(e) {
-            switch(e.key) {
-                case 'ArrowUp': movePlayer('up'); break;
-                case 'ArrowDown': movePlayer('down'); break;
-                case 'ArrowLeft': movePlayer('left'); break;
-                case 'ArrowRight': movePlayer('right'); break;
-                case 'i': toggleInventory(); break;
-            }
-        });
+
+        // 开场动画结束后移除开场元素
+        setTimeout(() => {
+            document.getElementById('opening').style.display = 'none';
+        }, 5500);
     </script>
 </body>
 </html>
